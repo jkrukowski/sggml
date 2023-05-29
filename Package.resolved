@@ -1,0 +1,32 @@
+{
+  "pins" : [
+    {
+      "identity" : "swift-argument-parser",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-argument-parser.git",
+      "state" : {
+        "revision" : "fee6933f37fde9a5e12a1e4aeaa93fe60116ff2a",
+        "version" : "1.2.2"
+      }
+    },
+    {
+      "identity" : "swift-filestream",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/tetsuok/swift-filestream",
+      "state" : {
+        "revision" : "a1c15b848e4f9c397bc68dfee0076c53eec57e62",
+        "version" : "1.0.0"
+      }
+    },
+    {
+      "identity" : "swift-log",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-log.git",
+      "state" : {
+        "revision" : "32e8d724467f8fe623624570367e3d50c5638e46",
+        "version" : "1.5.2"
+      }
+    }
+  ],
+  "version" : 2
+}
