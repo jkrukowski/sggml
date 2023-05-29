@@ -10,15 +10,6 @@
       }
     },
     {
-      "identity" : "swift-filestream",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/tetsuok/swift-filestream",
-      "state" : {
-        "revision" : "a1c15b848e4f9c397bc68dfee0076c53eec57e62",
-        "version" : "1.0.0"
-      }
-    },
-    {
       "identity" : "swift-log",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-log.git",
