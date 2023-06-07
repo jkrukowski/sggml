@@ -1,5 +1,6 @@
 import Foundation
 import ggml
+import Sggml
 
 internal enum Error: Swift.Error {
     case invalidModelPath
@@ -15,21 +16,21 @@ internal enum Constants {
 }
 
 internal struct Params {
-    internal var nInput: Int32
-    internal var nHidden: Int32
-    internal var nClasses: Int32
+    internal var nInput: Int
+    internal var nHidden: Int
+    internal var nClasses: Int
 }
 
 internal struct Layer {
-    internal var weight: UnsafeMutablePointer<ggml_tensor>
-    internal var bias: UnsafeMutablePointer<ggml_tensor>
+    internal var weight: Tensor
+    internal var bias: Tensor
 }
 
 internal struct Model: CustomDebugStringConvertible {
     internal var layer1: Layer
     internal var layer2: Layer
     internal var params: Params
-    internal var context: OpaquePointer
+    internal var context: Context
 
     internal var debugDescription: String {
         "<Mnist.Model: nInput: \(params.nInput), nHidden: \(params.nHidden), nClasses: \(params.nClasses)>"

@@ -18,7 +18,6 @@ internal struct Mnist: ParsableCommand {
             throw Error.invalidModelPath
         }
         let model = try readModel(at: modelPath)
-        defer { ggml_free(model.context) }
         logger.info("loaded model \(model)")
         let image = try readImage(at: imagesPath, index: Int.random(in: 0 ..< Constants.imageCount))
         print(image: image)

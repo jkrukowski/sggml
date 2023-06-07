@@ -12,6 +12,10 @@ let package = Package(
         .executable(
             name: "Mnist",
             targets: ["Mnist"]
+        ),
+        .library(
+            name: "Sggml",
+            targets: ["Sggml"]
         )
     ],
     dependencies: [
@@ -23,10 +27,14 @@ let package = Package(
             name: "ggml",
             path: "Sources/ggml"
         ),
+        .target(
+            name: "Sggml"
+        ),
         .executableTarget(
             name: "Mnist",
             dependencies: [
                 "ggml",
+                "Sggml",
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
                 .product(name: "Logging", package: "swift-log")
             ],
@@ -34,6 +42,9 @@ let package = Package(
             resources: [
                 .copy("models/t10k-images.idx3-ubyte"),
                 .copy("models/ggml-model-f32.bin")
+            ],
+            cSettings: [
+                // TODO:
             ]
         )
     ]
