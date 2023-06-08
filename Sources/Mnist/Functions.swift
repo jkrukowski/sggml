@@ -91,11 +91,12 @@ internal func readModel(at modelPath: URL) throws -> Model {
         throw Error.invalidFile
     }
 
+    let f32TypeSize = Int(TensorType.f32.typeSize)
     var contextSize = 0
-    contextSize += Constants.nInput * Constants.nHidden * Int(ggml_type_sizef(GGML_TYPE_F32)) // fc1 weight
-    contextSize += Constants.nHidden * Int(ggml_type_sizef(GGML_TYPE_F32)) // fc1 bias
-    contextSize += Constants.nHidden * Constants.nClasses * Int(ggml_type_sizef(GGML_TYPE_F32)) // fc2 weight
-    contextSize += Constants.nClasses * Int(ggml_type_sizef(GGML_TYPE_F32)) // fc2 bias
+    contextSize += Constants.nInput * Constants.nHidden * f32TypeSize // fc1 weight
+    contextSize += Constants.nHidden * f32TypeSize // fc1 bias
+    contextSize += Constants.nHidden * Constants.nClasses * f32TypeSize // fc2 weight
+    contextSize += Constants.nClasses * f32TypeSize // fc2 bias
 
     logger.info("ggml ctx size = \(Float(contextSize) / (1024.0 * 1024.0)) MB")
 

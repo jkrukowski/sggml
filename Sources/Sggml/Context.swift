@@ -39,35 +39,76 @@ extension Context {
 
 extension Context {
     public func tensor(type: TensorType, shape: [Int]) throws -> Tensor {
-        try Tensor(ggmlContext: ggmlContext, type: type, shape: shape.map { Int64($0) })
+        try Tensor(ggmlContext: ggmlContext, type: type, shape: shape)
     }
 }
 
 extension Context {
     public func matMul(_ t1: Tensor, _ t2: Tensor) throws -> Tensor {
         guard let ggmlTensor = ggml_mul_mat(ggmlContext, t1.ggmlTensor, t2.ggmlTensor) else {
-            throw Error.failedToCreateTesnor
+            throw Error.failedToCreateTensor
         }
         return Tensor(ggmlContext: ggmlContext, ggmlTensor: ggmlTensor)
     }
 
     public func add(_ t1: Tensor, _ t2: Tensor) throws -> Tensor {
         guard let ggmlTensor = ggml_add(ggmlContext, t1.ggmlTensor, t2.ggmlTensor) else {
-            throw Error.failedToCreateTesnor
+            throw Error.failedToCreateTensor
         }
         return Tensor(ggmlContext: ggmlContext, ggmlTensor: ggmlTensor)
     }
 
     public func relu(_ t1: Tensor) throws -> Tensor {
         guard let ggmlTensor = ggml_relu(ggmlContext, t1.ggmlTensor) else {
-            throw Error.failedToCreateTesnor
+            throw Error.failedToCreateTensor
         }
         return Tensor(ggmlContext: ggmlContext, ggmlTensor: ggmlTensor)
     }
 
     public func softmax(_ t1: Tensor) throws -> Tensor {
         guard let ggmlTensor = ggml_soft_max(ggmlContext, t1.ggmlTensor) else {
-            throw Error.failedToCreateTesnor
+            throw Error.failedToCreateTensor
+        }
+        return Tensor(ggmlContext: ggmlContext, ggmlTensor: ggmlTensor)
+    }
+
+    public func norm(_ t1: Tensor) throws -> Tensor {
+        guard let ggmlTensor = ggml_norm(ggmlContext, t1.ggmlTensor) else {
+            throw Error.failedToCreateTensor
+        }
+        return Tensor(ggmlContext: ggmlContext, ggmlTensor: ggmlTensor)
+    }
+
+    public func rows(_ t1: Tensor, _ t2: Tensor) throws -> Tensor {
+        guard let ggmlTensor = ggml_get_rows(ggmlContext, t1.ggmlTensor, t2.ggmlTensor) else {
+            throw Error.failedToCreateTensor
+        }
+        return Tensor(ggmlContext: ggmlContext, ggmlTensor: ggmlTensor)
+    }
+
+    public func `repeat`(_ t1: Tensor, _ t2: Tensor) throws -> Tensor {
+        guard let ggmlTensor = ggml_repeat(ggmlContext, t1.ggmlTensor, t2.ggmlTensor) else {
+            throw Error.failedToCreateTensor
+        }
+        return Tensor(ggmlContext: ggmlContext, ggmlTensor: ggmlTensor)
+    }
+
+    public func permute(
+        _ t1: Tensor,
+        _ axis0: Int,
+        _ axis1: Int,
+        _ axis2: Int,
+        _ axis3: Int
+    ) throws -> Tensor {
+        guard let ggmlTensor = ggml_permute(ggmlContext, t1.ggmlTensor, Int32(axis0), Int32(axis1), Int32(axis2), Int32(axis3)) else {
+            throw Error.failedToCreateTensor
+        }
+        return Tensor(ggmlContext: ggmlContext, ggmlTensor: ggmlTensor)
+    }
+
+    public func copy(_ t1: Tensor, _ t2: Tensor) throws -> Tensor {
+        guard let ggmlTensor = ggml_cpy(ggmlContext, t1.ggmlTensor, t2.ggmlTensor) else {
+            throw Error.failedToCreateTensor
         }
         return Tensor(ggmlContext: ggmlContext, ggmlTensor: ggmlTensor)
     }

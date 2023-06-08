@@ -1,6 +1,6 @@
 
 public enum Error: Swift.Error {
     case failedToCreateContext
-    case failedToCreateTesnor
+    case failedToCreateTensor
     case failedToGetData
 }
