@@ -10,8 +10,12 @@ let package = Package(
     ],
     products: [
         .executable(
-            name: "Mnist",
+            name: "mnist",
             targets: ["Mnist"]
+        ),
+        .executable(
+            name: "gpt2",
+            targets: ["Gpt2"]
         ),
         .library(
             name: "Sggml",
@@ -20,31 +24,39 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-log.git", from: "1.4.0"),
-        .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.2.0")
+        .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.2.0"),
+        .package(url: "https://github.com/jph00/BaseMath.git", branch: "master")
     ],
     targets: [
         .target(
-            name: "ggml",
-            path: "Sources/ggml"
+            name: "Utils"
         ),
         .target(
-            name: "Sggml"
+            name: "ggml"
+        ),
+        .target(
+            name: "Sggml",
+            dependencies: [
+                "ggml"
+            ]
         ),
         .executableTarget(
             name: "Mnist",
             dependencies: [
-                "ggml",
                 "Sggml",
+                "Utils",
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
                 .product(name: "Logging", package: "swift-log")
-            ],
-            path: "Sources/Mnist",
-            resources: [
-                .copy("models/t10k-images.idx3-ubyte"),
-                .copy("models/ggml-model-f32.bin")
-            ],
-            cSettings: [
-                // TODO:
+            ]
+        ),
+        .executableTarget(
+            name: "Gpt2",
+            dependencies: [
+                "Sggml",
+                "Utils",
+                "BaseMath",
+                .product(name: "ArgumentParser", package: "swift-argument-parser"),
+                .product(name: "Logging", package: "swift-log")
             ]
         )
     ]

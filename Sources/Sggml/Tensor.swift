@@ -10,16 +10,23 @@ public struct Tensor {
         }
     }
 
-    public var type: TensorType? {
-        TensorType(rawValue: ggmlTensor.pointee.type)
+    public var type: TensorType {
+        guard let type = TensorType(rawValue: ggmlTensor.pointee.type) else {
+            fatalError("Wrong tensor type \(ggmlTensor.pointee.type)")
+        }
+        return type
     }
 
     public var data: UnsafeMutableRawPointer {
         ggmlTensor.pointee.data
     }
 
-    public var maxLength: Int {
-        Int(ggml_nbytes(ggmlTensor))
+    public var byteCount: Int {
+        ggml_nbytes(ggmlTensor)
+    }
+
+    public var elementSize: Int {
+        ggml_element_size(ggmlTensor)
     }
 
     internal let ggmlTensor: UnsafeMutablePointer<ggml_tensor>
@@ -46,6 +53,22 @@ public struct Tensor {
 }
 
 extension Tensor {
+    public func numberOfBytes(at index: Int) -> Int {
+        assert(index < 4 && index >= 0)
+        switch index {
+        case 0:
+            return Int(ggmlTensor.pointee.nb.0)
+        case 1:
+            return Int(ggmlTensor.pointee.nb.1)
+        case 2:
+            return Int(ggmlTensor.pointee.nb.2)
+        case 3:
+            return Int(ggmlTensor.pointee.nb.3)
+        default:
+            fatalError("Index out of range")
+        }
+    }
+
     public func numberOfElements(at index: Int) -> Int {
         assert(index < 4 && index >= 0)
         switch index {
@@ -66,8 +89,8 @@ extension Tensor {
         Int(ggml_nelements(ggmlTensor))
     }
 
-    public func copy(from data: [Float]) {
-        ggmlTensor.pointee.data.copyMemory(from: data, byteCount: ggml_nbytes(ggmlTensor))
+    public func copy(from data: [some Any]) {
+        ggmlTensor.pointee.data.copyMemory(from: data, byteCount: byteCount)
     }
 
     public func data<Element>(count: Int) throws -> [Element] {

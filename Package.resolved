@@ -1,6 +1,15 @@
 {
   "pins" : [
     {
+      "identity" : "basemath",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/jph00/BaseMath.git",
+      "state" : {
+        "branch" : "master",
+        "revision" : "5fd3d82b6f342a90efaed26fae2c0de1b5f2edaa"
+      }
+    },
+    {
       "identity" : "swift-argument-parser",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-argument-parser.git",

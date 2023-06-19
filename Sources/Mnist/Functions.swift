@@ -2,27 +2,20 @@ import Foundation
 import ggml
 import Logging
 import Sggml
+import Utils
 
 private let logger = Logger(label: "sggml")
-
-private func read<T: BinaryInteger>(from stream: InputStream) -> T {
-    var data = [UInt8](repeating: 0, count: MemoryLayout<T>.size)
-    stream.read(&data, maxLength: data.count)
-    return data.withUnsafeBytes { pointer in
-        pointer.load(as: T.self)
-    }
-}
 
 private func readLayer1(
     stream: InputStream,
     context: Context,
     params: inout Params
 ) throws -> Layer {
-    let nDims: Int32 = read(from: stream)
+    let nDims: Int32 = stream.read()
 
     var neWeight: [Int32] = [0, 0]
     for index in 0 ..< nDims {
-        neWeight[Int(index)] = read(from: stream)
+        neWeight[Int(index)] = stream.read()
     }
     let nInput = Int(neWeight[0])
     let nHidden = Int(neWeight[1])
@@ -30,16 +23,16 @@ private func readLayer1(
     params.nHidden = nHidden
 
     var weight = try context.tensor(type: .f32, shape: [nInput, nHidden])
-    stream.read(weight.data, maxLength: weight.maxLength)
+    stream.read(weight.data, maxLength: weight.byteCount)
     weight.name = "fc1_weight"
 
     var neBias: [Int32] = [0, 0]
     for index in 0 ..< nDims {
-        neBias[Int(index)] = read(from: stream)
+        neBias[Int(index)] = stream.read()
     }
 
     var bias = try context.tensor(type: .f32, shape: [nHidden])
-    stream.read(bias.data, maxLength: bias.maxLength)
+    stream.read(bias.data, maxLength: bias.byteCount)
     bias.name = "fc1_bias"
 
     return Layer(weight: weight, bias: bias)
@@ -50,34 +43,29 @@ private func readLayer2(
     context: Context,
     params: inout Params
 ) throws -> Layer {
-    let nDims: Int32 = read(from: stream)
+    let nDims: Int32 = stream.read()
 
     var neWeight: [Int32] = [0, 0]
     for index in 0 ..< nDims {
-        neWeight[Int(index)] = read(from: stream)
+        neWeight[Int(index)] = stream.read()
     }
     let nClasses = Int(neWeight[1])
     params.nClasses = nClasses
 
     var weight = try context.tensor(type: .f32, shape: [params.nHidden, nClasses])
-    stream.read(weight.data, maxLength: weight.maxLength)
+    stream.read(weight.data, maxLength: weight.byteCount)
     weight.name = "fc2_weight"
 
     var neBias: [Int32] = [0, 0]
     for index in 0 ..< nDims {
-        neBias[Int(index)] = read(from: stream)
+        neBias[Int(index)] = stream.read()
     }
 
     var bias = try context.tensor(type: .f32, shape: [nClasses])
-    stream.read(bias.data, maxLength: bias.maxLength)
+    stream.read(bias.data, maxLength: bias.byteCount)
     bias.name = "fc2_bias"
 
     return Layer(weight: weight, bias: bias)
-}
-
-private func verifyMagic(stream: InputStream) -> Bool {
-    let number: Int32 = read(from: stream)
-    return number == 0x67676D6C
 }
 
 internal func readModel(at modelPath: URL) throws -> Model {
@@ -111,7 +99,7 @@ internal func readModel(at modelPath: URL) throws -> Model {
 internal func predict(
     image: [Float],
     model: Model,
-    numberOfThreads: Int = 1
+    numberOfThreads: Int
 ) throws -> Int {
     let bufferSize = Int(model.params.nInput) * 4 * MemoryLayout<Float>.alignment
     let context = try Context(memorySize: bufferSize, noAlloc: false)
@@ -129,7 +117,7 @@ internal func predict(
     graph.buildForwardExpand(for: probabilities)
     context.compute(graph: &graph)
 
-    let prediction: [Float] = try probabilities.data(count: Int(model.params.nClasses))
+    let prediction: [Float] = try probabilities.data(count: model.params.nClasses)
     var maxElement = prediction[0]
     var maxIndex = 0
     for (index, element) in prediction.enumerated() {
