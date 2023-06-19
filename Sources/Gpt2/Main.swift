@@ -1,5 +1,6 @@
 import ArgumentParser
 import Foundation
+import ggml
 import Logging
 import Sggml
 import Utils
@@ -37,8 +38,11 @@ internal struct Gpt2: ParsableCommand {
             memoryPerToken: &memoryPerToken
         )
 
+        var predictTime: Int64 = 0
+
         let chunkedInputEmbeddings = inputEmbeddings.chunked(into: promptBatchSize)
         for (index, input) in chunkedInputEmbeddings.dropLast().enumerated() {
+            let startTime = ggml_time_us()
             try predict(
                 model: model,
                 numberOfThreads: numberOfThreads,
@@ -46,19 +50,24 @@ internal struct Gpt2: ParsableCommand {
                 inputEmbeddings: input,
                 memoryPerToken: &memoryPerToken
             )
+            predictTime += ggml_time_us() - startTime
             for tokenId in input {
                 print(model.vocab.idToToken[tokenId, default: ""], terminator: "")
             }
+            flushStdout()
         }
         guard let lastChunkedInput = chunkedInputEmbeddings.last else {
             return
         }
+
         var input = lastChunkedInput
         var nPast = (chunkedInputEmbeddings.count - 1) * promptBatchSize
         for _ in 0 ... predictCount {
             for tokenId in input {
                 print(model.vocab.idToToken[tokenId, default: ""], terminator: "")
             }
+            flushStdout()
+            let startTime = ggml_time_us()
             let embeddings = try predict(
                 model: model,
                 numberOfThreads: numberOfThreads,
@@ -66,6 +75,7 @@ internal struct Gpt2: ParsableCommand {
                 inputEmbeddings: input,
                 memoryPerToken: &memoryPerToken
             )
+            predictTime += ggml_time_us() - startTime
             let index = try sampleTopKTopP(
                 vocab: model.vocab,
                 logits: embeddings,
@@ -75,11 +85,13 @@ internal struct Gpt2: ParsableCommand {
             )
             if index == 50256 {
                 print("")
-                logger.info("Done: end of text token found")
+                logger.info("\nDone: end of text token found")
                 break
             }
             nPast += input.count
             input = [index]
         }
+        print("")
+        logger.info("\nPredict time: \(Float(predictTime) / 1000.0)ms / per token: \(Float(predictTime) / 1000.0 / Float(nPast))ms")
     }
 }

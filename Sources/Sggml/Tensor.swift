@@ -89,8 +89,12 @@ extension Tensor {
         Int(ggml_nelements(ggmlTensor))
     }
 
-    public func copy(from data: [some Any]) {
+    public func copy<T>(from data: [T]) {
         ggmlTensor.pointee.data.copyMemory(from: data, byteCount: byteCount)
+    }
+
+    public func copy(from tensor: Tensor) {
+        memcpy(data, tensor.data, tensor.byteCount)
     }
 
     public func data<Element>(count: Int) throws -> [Element] {

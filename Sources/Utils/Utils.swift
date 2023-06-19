@@ -1,4 +1,9 @@
 import Foundation
+#if os(Linux)
+    import Glibc
+#else
+    import Darwin.C
+#endif
 
 extension InputStream {
     public func read<T: BinaryInteger>() -> T {
@@ -8,6 +13,10 @@ extension InputStream {
             pointer.load(as: T.self)
         }
     }
+}
+
+public func flushStdout() {
+    fflush(stdout)
 }
 
 public func verifyMagic(stream: InputStream) -> Bool {

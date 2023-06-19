@@ -36,4 +36,5 @@
 --xcodeindentation disabled
 --exclude Pods,BuildTools
 --commas inline
+--someAny false
 --exclude Snapshots

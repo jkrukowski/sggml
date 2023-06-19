@@ -248,7 +248,7 @@ private func loadModelData(
         assert(readLength == tensor.byteCount)
 
         if name == "model/wte", !hasLmHead {
-            memcpy(model.lm_head.data, tensor.data, tensor.byteCount)
+            model.lm_head.copy(from: tensor)
         }
         if name == "model/lm_head" {
             hasLmHead = true
@@ -388,12 +388,10 @@ internal func predict(
 
     let embd = try context.tensor(type: .i32, shape: [N])
     embd.copy(from: inputEmbeddings.map { Int32($0) })
-    // memcpy(embd.data, inputEmbeddings.map { Int32($0) }, N * embd.elementSize)
 
     let position = try context.tensor(type: .i32, shape: [N])
     let positionData = (0 ..< N).map { Int32(nPast + $0) }
     position.copy(from: positionData)
-    // memcpy(position.data, positionData, N * position.elementSize)
 
     var inpL = try context.add(
         context.rows(model.wte, embd),
