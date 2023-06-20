@@ -32,7 +32,14 @@ let package = Package(
             name: "Utils"
         ),
         .target(
-            name: "ggml"
+            name: "ggml",
+            cSettings: [
+                .unsafeFlags(["-Wno-shorten-64-to-32"]),
+                .define("GGML_USE_ACCELERATE")
+            ],
+            linkerSettings: [
+                .linkedFramework("Accelerate")
+            ]
         ),
         .target(
             name: "Sggml",

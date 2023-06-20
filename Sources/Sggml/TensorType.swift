@@ -13,6 +13,13 @@ public enum TensorType {
     case q8_0
     case q8_1
 
+    case q2_k
+    case q3_k
+    case q4_k
+    case q5_k
+    case q6_k
+    case q8_k
+
     case i8
     case i16
     case i32
@@ -44,6 +51,19 @@ extension TensorType {
             self = .q8_0
         case GGML_TYPE_Q8_1:
             self = .q8_1
+        // k-quantizations
+        case GGML_TYPE_Q2_K:
+            self = .q2_k
+        case GGML_TYPE_Q3_K:
+            self = .q3_k
+        case GGML_TYPE_Q4_K:
+            self = .q4_k
+        case GGML_TYPE_Q5_K:
+            self = .q5_k
+        case GGML_TYPE_Q6_K:
+            self = .q6_k
+        case GGML_TYPE_Q8_K:
+            self = .q8_k
         case GGML_TYPE_I8:
             self = .i8
         case GGML_TYPE_I16:
@@ -98,6 +118,18 @@ extension TensorType {
             return GGML_TYPE_Q8_0
         case .q8_1:
             return GGML_TYPE_Q8_1
+        case .q2_k:
+            return GGML_TYPE_Q2_K
+        case .q3_k:
+            return GGML_TYPE_Q3_K
+        case .q4_k:
+            return GGML_TYPE_Q4_K
+        case .q5_k:
+            return GGML_TYPE_Q5_K
+        case .q6_k:
+            return GGML_TYPE_Q6_K
+        case .q8_k:
+            return GGML_TYPE_Q8_K
         case .i8:
             return GGML_TYPE_I8
         case .i16:
