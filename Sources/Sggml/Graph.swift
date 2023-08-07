@@ -2,11 +2,11 @@ import ggml
 
 public struct Graph {
     internal var ggmlGraph: ggml_cgraph
+    internal var numberOfThreads: Int
 
     public init(numberOfThreads: Int) {
-        var graph = ggml_cgraph()
-        graph.n_threads = Int32(numberOfThreads)
-        ggmlGraph = graph
+        ggmlGraph = ggml_cgraph()
+        self.numberOfThreads = numberOfThreads
     }
 
     public mutating func buildForwardExpand(for tensor: Tensor) {

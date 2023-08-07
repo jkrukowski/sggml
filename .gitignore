@@ -9,3 +9,5 @@ DerivedData/
 .netrc
 .vscode/
 .swiftpm/
+Models/
+Datasets/

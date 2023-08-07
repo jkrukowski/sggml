@@ -17,6 +17,14 @@ let package = Package(
             name: "gpt2",
             targets: ["Gpt2"]
         ),
+        .executable(
+            name: "bert-spam",
+            targets: ["BertSpam"]
+        ),
+        .library(
+            name: "Tokenizer",
+            targets: ["Tokenizer"]
+        ),
         .library(
             name: "Sggml",
             targets: ["Sggml"]
@@ -34,17 +42,36 @@ let package = Package(
         .target(
             name: "ggml",
             cSettings: [
-                .unsafeFlags(["-Wno-shorten-64-to-32"]),
-                .define("GGML_USE_ACCELERATE")
+                .unsafeFlags(["-Wno-shorten-64-to-32", "-Ofast"], .when(configuration: .release)),
+                .unsafeFlags(["-Wno-shorten-64-to-32"], .when(configuration: .debug)),
+                .define("GGML_USE_ACCELERATE", .when(platforms: [.macOS]))
             ],
             linkerSettings: [
-                .linkedFramework("Accelerate")
+                .linkedFramework("Accelerate", .when(platforms: [.macOS]))
+            ]
+        ),
+        .target(
+            name: "Tokenizer",
+            dependencies: [
+            ],
+            resources: [
+                .copy("vocab.txt")
             ]
         ),
         .target(
             name: "Sggml",
             dependencies: [
                 "ggml"
+            ]
+        ),
+        .executableTarget(
+            name: "BertSpam",
+            dependencies: [
+                "Sggml",
+                "Utils",
+                "Tokenizer",
+                .product(name: "ArgumentParser", package: "swift-argument-parser"),
+                .product(name: "Logging", package: "swift-log")
             ]
         ),
         .executableTarget(

@@ -37,7 +37,7 @@ public struct Context {
 
 extension Context {
     public func compute(graph: inout Graph) {
-        ggml_graph_compute(ggmlContext, &graph.ggmlGraph)
+        ggml_graph_compute_with_ctx(ggmlContext, &graph.ggmlGraph, Int32(graph.numberOfThreads))
     }
 }
 
@@ -227,6 +227,27 @@ extension Context {
 
     public func f32(_ value: Float) throws -> Tensor {
         guard let ggmlTensor = ggml_new_f32(ggmlContext, value) else {
+            throw Error.failedToCreateTensor
+        }
+        return Tensor(ggmlContext: ggmlContext, ggmlTensor: ggmlTensor)
+    }
+
+    public func zero(_ t: Tensor) throws -> Tensor {
+        guard let ggmlTensor = ggml_set_zero(t.ggmlTensor) else {
+            throw Error.failedToCreateTensor
+        }
+        return Tensor(ggmlContext: ggmlContext, ggmlTensor: ggmlTensor)
+    }
+
+    public func transpose(_ t: Tensor) throws -> Tensor {
+        guard let ggmlTensor = ggml_transpose(ggmlContext, t.ggmlTensor) else {
+            throw Error.failedToCreateTensor
+        }
+        return Tensor(ggmlContext: ggmlContext, ggmlTensor: ggmlTensor)
+    }
+
+    public func cont(_ t: Tensor) throws -> Tensor {
+        guard let ggmlTensor = ggml_cont(ggmlContext, t.ggmlTensor) else {
             throw Error.failedToCreateTensor
         }
         return Tensor(ggmlContext: ggmlContext, ggmlTensor: ggmlTensor)

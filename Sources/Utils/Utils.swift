@@ -28,6 +28,7 @@ public enum Error: Swift.Error {
     case invalidModelPath
     case invalidFile
     case failedToAllocateMemory
+    case failedToProcess
 }
 
 extension Array {
