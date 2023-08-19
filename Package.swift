@@ -22,10 +22,6 @@ let package = Package(
             targets: ["BertSpam"]
         ),
         .library(
-            name: "Tokenizer",
-            targets: ["Tokenizer"]
-        ),
-        .library(
             name: "Sggml",
             targets: ["Sggml"]
         )
@@ -33,7 +29,8 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/apple/swift-log.git", from: "1.4.0"),
         .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.2.0"),
-        .package(url: "https://github.com/jph00/BaseMath.git", branch: "master")
+        .package(url: "https://github.com/jph00/BaseMath.git", branch: "master"),
+        .package(url: "https://github.com/huggingface/swift-transformers", from: "0.1.0")
     ],
     targets: [
         .target(
@@ -51,14 +48,6 @@ let package = Package(
             ]
         ),
         .target(
-            name: "Tokenizer",
-            dependencies: [
-            ],
-            resources: [
-                .copy("vocab.txt")
-            ]
-        ),
-        .target(
             name: "Sggml",
             dependencies: [
                 "ggml"
@@ -69,9 +58,13 @@ let package = Package(
             dependencies: [
                 "Sggml",
                 "Utils",
-                "Tokenizer",
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
-                .product(name: "Logging", package: "swift-log")
+                .product(name: "Logging", package: "swift-log"),
+                .product(name: "Transformers", package: "swift-transformers")
+            ],
+            exclude: [
+                "convert.ipynb",
+                "train.ipynb"
             ]
         ),
         .executableTarget(
